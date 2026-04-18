@@ -127,7 +127,7 @@ server blocks over Traefik labels.
 
 ## Example files
 
-- `.env.example`
+- `omada-saml-oidc.env.example`
 - `examples/docker-compose.yml`
 - `examples/traefik-pocket-id.yml`
 - `examples/traefik-authelia.yml`
