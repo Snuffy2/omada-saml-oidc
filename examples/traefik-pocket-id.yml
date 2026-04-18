@@ -1,0 +1,51 @@
+http:
+  routers:
+    omada-root:
+      entryPoints: websecure
+      rule: Host(`omada.example.com`) && Path(`/`)
+      middlewares:
+        - omada-launch
+      service: omada-controller
+
+    bridge-launch:
+      entryPoints: websecure
+      rule: Host(`bridge.example.com`) && PathPrefix(`/launch/omada`)
+      service: omada-saml-oidc
+
+    omada-acs:
+      entryPoints: websecure
+      rule: Host(`omada.example.com`) && Path(`/sso/saml/login`)
+      service: omada-saml-oidc
+
+    omada-controller:
+      entryPoints: websecure
+      rule: Host(`omada.example.com`)
+      service: omada-controller
+
+    oidc-provider:
+      entryPoints: websecure
+      rule: Host(`auth.example.com`)
+      service: pocket-id
+
+  middlewares:
+    omada-launch:
+      redirectRegex:
+        regex: '^https://omada\.example\.com/?$'
+        replacement: 'https://bridge.example.com/launch/omada'
+        permanent: false
+
+  services:
+    omada-saml-oidc:
+      loadBalancer:
+        servers:
+          - url: http://omada-saml-oidc:8080/
+
+    omada-controller:
+      loadBalancer:
+        servers:
+          - url: https://controller-1.internal:443/
+
+    pocket-id:
+      loadBalancer:
+        servers:
+          - url: http://pocket-id:3000/

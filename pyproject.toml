@@ -1,0 +1,172 @@
+[build-system]
+requires = ["setuptools>=78", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omada-saml-oidc"
+dynamic = ["version"]
+description = "Omada SAML to OIDC Bridge"
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+authors = [{ name = "omada-saml-oidc contributors" }]
+keywords = ["omada", "saml", "oidc", "satosa", "bridge"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: System Administrators",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: System :: Systems Administration :: Authentication/Directory",
+]
+dependencies = [
+  "cryptography>=43.0,<44.0",
+  "gunicorn>=23.0",
+  "pyOpenSSL>=24.2,<24.3",
+  "PyYAML>=6.0",
+  "SATOSA==8.5.1",
+]
+
+[dependency-groups]
+lint = [
+    "cryptography",
+    "mypy",
+    "prek",
+    "ruff",
+    "types-cffi",
+    "types-PyMySQL",
+    "types-pyRFC3339",
+    "types-python-dateutil",
+    "types-PyYAML",
+    "types-requests",
+    "types-setuptools",
+]
+pytest = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-timeout",
+]
+dev = [
+    { include-group = "lint" },
+    { include-group = "pytest" },
+]
+
+[project.scripts]
+omada-saml-oidc = "omada_saml_oidc.supervisor:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.dynamic]
+version = { attr = "omada_saml_oidc.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+omada_saml_oidc = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = """
+  -q
+  --timeout=20
+  --durations=10
+  -o console_output_style=progress
+  --cov=omada_saml_oidc
+  --cov-report=term-missing
+  --cov-report=html
+"""
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+branch = true
+source = ["omada_saml_oidc"]
+relative_files = true
+parallel = false
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.ruff]
+line-length = 100
+indent-width = 4
+fix = true
+force-exclude = true
+target-version = "py314"
+required-version = ">=0.15.0"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "SIM", "UP"]
+ignore = [
+  "COM812",
+  "D203",
+  "D213",
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"async_timeout".msg = "use asyncio.timeout instead"
+"pytz".msg = "use zoneinfo instead"
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+combine-as-imports = true
+split-on-trailing-comma = false
+
+[tool.ruff.lint.mccabe]
+max-complexity = 25
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+property-decorators = ["propcache.api.cached_property"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_unused_ignores = true
+warn_return_any = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+mypy_path = "src"
+files = ["src"]
+local_partial_types = true
+strict_equality = true
+no_implicit_optional = true
+warn_incomplete_stub = true
+warn_redundant_casts = true
+warn_unused_configs = true
+extra_checks = false
+explicit_package_bases = true
+check_untyped_defs = true
+disallow_subclassing_any = false
+disallow_untyped_calls = true
+disallow_untyped_decorators = false
+warn_unreachable = false
+
+[[tool.mypy.overrides]]
+module = [
+  "saml2.*",
+]
+ignore_missing_imports = true
+
+[tool.codespell]
+skip = "*.py,*.toml,CHANGELOG.*"
+quiet-level = 3

@@ -1,0 +1,23 @@
+services:
+  omada-saml-oidc:
+    image: ghcr.io/snuffy2/omada-saml-oidc:latest
+    container_name: omada-saml-oidc
+    restart: unless-stopped
+    env_file:
+      - omada-saml-oidc.env
+    ports:
+      - "8080:8080"
+    volumes:
+      - omada-saml-oidc-data:/data
+    networks:
+      - omada
+
+  # Run Pocket ID or Authelia on the same Docker network, then point
+  # OIDC_PROVIDER_ISSUER at the public HTTPS issuer URL.
+
+networks:
+  omada:
+    name: omada
+
+volumes:
+  omada-saml-oidc-data:
