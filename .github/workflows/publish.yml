@@ -59,7 +59,7 @@ jobs:
             type=raw,value=latest,enable=${{ github.event_name == 'release' && !github.event.release.draft && !github.event.release.prerelease }}
 
       - name: Log in to GHCR
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.5.2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
